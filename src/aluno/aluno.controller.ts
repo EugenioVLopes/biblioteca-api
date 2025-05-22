@@ -3,11 +3,17 @@ import {
   Controller,
   Delete,
   Get,
+  HttpStatus,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
 } from '@nestjs/common';
 import {
+  ApiBadRequestResponse,
+  ApiBody,
+  ApiConflictResponse,
+  ApiNotFoundResponse,
   ApiOperation,
   ApiParam,
   ApiResponse,
@@ -17,138 +23,137 @@ import { AlunoService } from './aluno.service';
 import { CreateAlunoDto } from './dto/create-aluno/create-aluno';
 import { UpdateAlunoDto } from './dto/update-aluno/update-aluno';
 
-@ApiTags('Alunos')
+@ApiTags('Gestão de Alunos')
 @Controller('aluno')
 export class AlunoController {
   constructor(private readonly alunoService: AlunoService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Criar um aluno' })
+  @ApiOperation({
+    summary: 'Criar um novo aluno',
+    description: 'Endpoint para cadastrar um novo aluno no sistema. Todos os campos são obrigatórios.'
+  })
+  @ApiBody({ type: CreateAlunoDto })
   @ApiResponse({
-    status: 201,
+    status: HttpStatus.CREATED,
     description: 'Aluno criado com sucesso.',
-    type: Object,
-    schema: {
-      example: {
-        mat: 2022001234,
-        nome: 'Maria Silva',
-        email: 'maria@email.com',
-        curso: 'Sistemas de Informação',
-      },
-    },
+    type: CreateAlunoDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'Dados inválidos fornecidos. Verifique o formato dos campos.',
+  })
+  @ApiConflictResponse({
+    description: 'Já existe um aluno cadastrado com esta matrícula.',
   })
   create(@Body() createAlunoDto: CreateAlunoDto) {
     return this.alunoService.create(createAlunoDto);
   }
 
   @Get()
-  @ApiOperation({ summary: 'Listar todos os alunos' })
+  @ApiOperation({
+    summary: 'Listar todos os alunos',
+    description: 'Retorna uma lista com todos os alunos cadastrados no sistema, ordenados por nome.'
+  })
   @ApiResponse({
-    status: 200,
+    status: HttpStatus.OK,
     description: 'Lista de alunos retornada com sucesso.',
-    type: Array,
-    schema: {
-      example: [
-        {
-          mat: 2022001234,
-          nome: 'Maria Silva',
-          email: 'maria@email.com',
-          curso: 'Sistemas de Informação',
-        },
-        {
-          mat: 2022005678,
-          nome: 'João Souza',
-          email: 'joao@email.com',
-          curso: 'Engenharia da Computação',
-        },
-      ],
-    },
+    type: [CreateAlunoDto],
   })
   findAll() {
     return this.alunoService.findAll();
   }
 
   @Get(':mat')
-  @ApiOperation({ summary: 'Buscar aluno pelo número de matrícula' })
+  @ApiOperation({
+    summary: 'Buscar aluno pelo número de matrícula',
+    description: 'Retorna os dados de um aluno específico baseado no número de matrícula.'
+  })
   @ApiParam({
     name: 'mat',
     description: 'Número de matrícula do aluno',
     example: 2022001234,
+    type: Number,
   })
   @ApiResponse({
-    status: 200,
+    status: HttpStatus.OK,
     description: 'Aluno encontrado com sucesso.',
-    type: Object,
-    schema: {
-      example: {
-        mat: 2022001234,
-        nome: 'Maria Silva',
-        email: 'maria@email.com',
-        curso: 'Sistemas de Informação',
-      },
-    },
+    type: CreateAlunoDto,
   })
-  @ApiResponse({
-    status: 404,
-    description: 'Aluno não encontrado.',
+  @ApiNotFoundResponse({
+    description: 'Aluno não encontrado com a matrícula informada.',
   })
-  findOne(@Param('mat') mat: string) {
-    return this.alunoService.findOne(Number(mat));
+  @ApiBadRequestResponse({
+    description: 'Número de matrícula inválido.',
+  })
+  findOne(@Param('mat', ParseIntPipe) mat: number) {
+    return this.alunoService.findOne(mat);
   }
 
   @Patch(':mat')
-  @ApiOperation({ summary: 'Atualizar dados de um aluno' })
+  @ApiOperation({
+    summary: 'Atualizar dados de um aluno',
+    description: 'Atualiza os dados de um aluno existente. Apenas os campos fornecidos serão atualizados.'
+  })
   @ApiParam({
     name: 'mat',
     description: 'Número de matrícula do aluno',
     example: 2022001234,
+    type: Number,
   })
+  @ApiBody({ type: UpdateAlunoDto })
   @ApiResponse({
-    status: 200,
+    status: HttpStatus.OK,
     description: 'Aluno atualizado com sucesso.',
-    type: Object,
-    schema: {
-      example: {
-        mat: 2022001234,
-        nome: 'Maria Silva Atualizada',
-        email: 'maria_atualizada@email.com',
-        curso: 'Análise de Dados',
-      },
-    },
+    type: CreateAlunoDto,
   })
-  @ApiResponse({
-    status: 404,
-    description: 'Aluno não encontrado.',
+  @ApiNotFoundResponse({
+    description: 'Aluno não encontrado com a matrícula informada.',
+  })
+  @ApiBadRequestResponse({
+    description: 'Dados inválidos fornecidos. Verifique o formato dos campos.',
   })
   update(
-    @Param('mat') mat: string,
+    @Param('mat', ParseIntPipe) mat: number,
     @Body() updateAlunoDto: UpdateAlunoDto,
   ) {
-    return this.alunoService.update(Number(mat), updateAlunoDto);
+    return this.alunoService.update(mat, updateAlunoDto);
   }
 
   @Delete(':mat')
-  @ApiOperation({ summary: 'Remover um aluno' })
+  @ApiOperation({
+    summary: 'Remover um aluno',
+    description: 'Remove permanentemente um aluno do sistema.'
+  })
   @ApiParam({
     name: 'mat',
     description: 'Número de matrícula do aluno',
     example: 2022001234,
+    type: Number,
   })
   @ApiResponse({
-    status: 200,
+    status: HttpStatus.OK,
     description: 'Aluno removido com sucesso.',
     schema: {
-      example: {
-        message: 'Aluno removido com sucesso',
-        mat: 2022001234,
+      type: 'object',
+      properties: {
+        message: {
+          type: 'string',
+          example: 'Aluno removido com sucesso',
+        },
+        mat: {
+          type: 'number',
+          example: 2022001234,
+        },
       },
     },
   })
-  @ApiResponse({
-    status: 404,
-    description: 'Aluno não encontrado.',
+  @ApiNotFoundResponse({
+    description: 'Aluno não encontrado com a matrícula informada.',
   })
-  remove(@Param('mat') mat: string) {
-    return this.alunoService.remove(Number(mat));
+  @ApiBadRequestResponse({
+    description: 'Número de matrícula inválido.',
+  })
+  remove(@Param('mat', ParseIntPipe) mat: number) {
+    return this.alunoService.remove(mat);
   }
 }
