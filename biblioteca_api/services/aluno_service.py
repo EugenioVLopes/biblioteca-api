@@ -15,38 +15,38 @@ class AlunoService:
     @staticmethod
     def criar_aluno(
         db: Session,
-        mat: str,
-        nome: str,
-        email: Optional[str] = None,
-        curso: Optional[str] = None,
+        MAT_ALUNO: int,
+        NOME: str,
+        EMAIL: Optional[str] = None,
+        CURSO: Optional[str] = None,
     ) -> Optional[Aluno]:
         """
         Cria um novo aluno no banco de dados
 
         Args:
             db: Sessão do banco de dados
-            mat: Matrícula do aluno (chave primária)
-            nome: Nome do aluno
-            email: Email do aluno (opcional)
-            curso: Curso do aluno (opcional)
+            MAT_ALUNO: Matrícula do aluno (chave primária)
+            NOME: Nome do aluno
+            EMAIL: Email do aluno (opcional)
+            CURSO: Curso do aluno (opcional)
 
         Returns:
             Objeto Aluno criado ou None em caso de erro
         """
         try:
-            aluno_existente = AlunoService.buscar_por_matricula(db, mat)
+            aluno_existente = AlunoService.buscar_por_matricula(db, MAT_ALUNO)
 
             if aluno_existente:
-                logger.warning(f"Aluno com matrícula {mat} já existe")
+                logger.warning(f"Aluno com matrícula {MAT_ALUNO} já existe")
                 return None
 
-            novo_aluno = Aluno(mat=mat, nome=nome, email=email, curso=curso)
+            novo_aluno = Aluno(MAT_ALUNO=MAT_ALUNO, NOME=NOME, EMAIL=EMAIL, CURSO=CURSO)
 
             db.add(novo_aluno)
             db.commit()
             db.refresh(novo_aluno)
 
-            logger.info(f"Aluno criado com sucesso: {mat}")
+            logger.info(f"Aluno criado com sucesso: {MAT_ALUNO}")
             return novo_aluno
 
         except SQLAlchemyError as e:
@@ -55,41 +55,41 @@ class AlunoService:
             return None
 
     @staticmethod
-    def buscar_por_matricula(db: Session, mat: str) -> Optional[Aluno]:
+    def buscar_por_matricula(db: Session, MAT_ALUNO: int) -> Optional[Aluno]:
         """
         Busca um aluno pela matrícula
 
         Args:
             db: Sessão do banco de dados
-            mat: Matrícula do aluno
+            MAT_ALUNO: Matrícula do aluno
 
         Returns:
             Objeto Aluno encontrado ou None
         """
         try:
-            aluno = db.query(Aluno).filter(Aluno.mat == mat).first()
+            aluno = db.query(Aluno).filter(Aluno.MAT_ALUNO == MAT_ALUNO).first()
             return aluno
         except SQLAlchemyError as e:
-            logger.error(f"Erro ao buscar aluno por matrícula {mat}: {e}")
+            logger.error(f"Erro ao buscar aluno por matrícula {MAT_ALUNO}: {e}")
             return None
 
     @staticmethod
-    def buscar_por_email(db: Session, email: str) -> Optional[Aluno]:
+    def buscar_por_email(db: Session, EMAIL: str) -> Optional[Aluno]:
         """
         Busca um aluno pelo email
 
         Args:
             db: Sessão do banco de dados
-            email: Email do aluno
+            EMAIL: Email do aluno
 
         Returns:
             Objeto Aluno encontrado ou None
         """
         try:
-            aluno = db.query(Aluno).filter(Aluno.email == email).first()
+            aluno = db.query(Aluno).filter(Aluno.EMAIL == EMAIL).first()
             return aluno
         except SQLAlchemyError as e:
-            logger.error(f"Erro ao buscar aluno por email {email}: {e}")
+            logger.error(f"Erro ao buscar aluno por email {EMAIL}: {e}")
             return None
 
     @staticmethod
@@ -113,115 +113,115 @@ class AlunoService:
             return []
 
     @staticmethod
-    def buscar_por_nome(db: Session, nome: str) -> List[Aluno]:
+    def buscar_por_nome(db: Session, NOME: str) -> List[Aluno]:
         """
         Busca alunos por nome (busca parcial, case-insensitive)
 
         Args:
             db: Sessão do banco de dados
-            nome: Nome ou parte do nome para buscar
+            NOME: Nome ou parte do nome para buscar
 
         Returns:
             Lista de objetos Aluno que correspondem à busca
         """
         try:
-            alunos = db.query(Aluno).filter(Aluno.nome.ilike(f"%{nome}%")).all()
+            alunos = db.query(Aluno).filter(Aluno.NOME.ilike(f"%{NOME}%")).all()
             return alunos
         except SQLAlchemyError as e:
-            logger.error(f"Erro ao buscar alunos por nome {nome}: {e}")
+            logger.error(f"Erro ao buscar alunos por nome {NOME}: {e}")
             return []
 
     @staticmethod
-    def buscar_por_curso(db: Session, curso: str) -> List[Aluno]:
+    def buscar_por_curso(db: Session, CURSO: str) -> List[Aluno]:
         """
         Busca alunos por curso
 
         Args:
             db: Sessão do banco de dados
-            curso: Curso para buscar
+            CURSO: Curso para buscar
 
         Returns:
             Lista de objetos Aluno do curso especificado
         """
         try:
-            alunos = db.query(Aluno).filter(Aluno.curso == curso).all()
+            alunos = db.query(Aluno).filter(Aluno.CURSO == CURSO).all()
             return alunos
         except SQLAlchemyError as e:
-            logger.error(f"Erro ao buscar alunos por curso {curso}: {e}")
+            logger.error(f"Erro ao buscar alunos por curso {CURSO}: {e}")
             return []
 
     @staticmethod
     def atualizar_aluno(
         db: Session,
-        mat: str,
-        nome: Optional[str] = None,
-        email: Optional[str] = None,
-        curso: Optional[str] = None,
+        MAT_ALUNO: int,
+        NOME: Optional[str] = None,
+        EMAIL: Optional[str] = None,
+        CURSO: Optional[str] = None,
     ) -> Optional[Aluno]:
         """
         Atualiza os dados de um aluno
 
         Args:
             db: Sessão do banco de dados
-            mat: Matrícula do aluno a ser atualizado
-            nome: Novo nome (opcional)
-            email: Novo email (opcional)
-            curso: Novo curso (opcional)
+            MAT_ALUNO: Matrícula do aluno a ser atualizado
+            NOME: Novo nome (opcional)
+            EMAIL: Novo email (opcional)
+            CURSO: Novo curso (opcional)
 
         Returns:
             Objeto Aluno atualizado ou None em caso de erro
         """
         try:
-            aluno = AlunoService.buscar_por_matricula(db, mat)
+            aluno = AlunoService.buscar_por_matricula(db, MAT_ALUNO)
             if not aluno:
-                logger.warning(f"Aluno com matrícula {mat} não encontrado")
+                logger.warning(f"Aluno com matrícula {MAT_ALUNO} não encontrado")
                 return None
 
             # Atualiza apenas os campos fornecidos
-            if nome is not None:
-                aluno.nome = nome
-            if email is not None:
-                aluno.email = email
-            if curso is not None:
-                aluno.curso = curso
+            if NOME is not None:
+                aluno.NOME = NOME
+            if EMAIL is not None:
+                aluno.EMAIL = EMAIL
+            if CURSO is not None:
+                aluno.CURSO = CURSO
 
             db.commit()
             db.refresh(aluno)
 
-            logger.info(f"Aluno {mat} atualizado com sucesso")
+            logger.info(f"Aluno {MAT_ALUNO} atualizado com sucesso")
             return aluno
 
         except SQLAlchemyError as e:
-            logger.error(f"Erro ao atualizar aluno {mat}: {e}")
+            logger.error(f"Erro ao atualizar aluno {MAT_ALUNO}: {e}")
             db.rollback()
             return None
 
     @staticmethod
-    def deletar_aluno(db: Session, mat: str) -> bool:
+    def deletar_aluno(db: Session, MAT_ALUNO: int) -> bool:
         """
         Deleta um aluno do banco de dados
 
         Args:
             db: Sessão do banco de dados
-            mat: Matrícula do aluno a ser deletado
+            MAT_ALUNO: Matrícula do aluno a ser deletado
 
         Returns:
             True se deletado com sucesso, False caso contrário
         """
         try:
-            aluno = AlunoService.buscar_por_matricula(db, mat)
+            aluno = AlunoService.buscar_por_matricula(db, MAT_ALUNO)
             if not aluno:
-                logger.warning(f"Aluno com matrícula {mat} não encontrado")
+                logger.warning(f"Aluno com matrícula {MAT_ALUNO} não encontrado")
                 return False
 
             db.delete(aluno)
             db.commit()
 
-            logger.info(f"Aluno {mat} deletado com sucesso")
+            logger.info(f"Aluno {MAT_ALUNO} deletado com sucesso")
             return True
 
         except SQLAlchemyError as e:
-            logger.error(f"Erro ao deletar aluno {mat}: {e}")
+            logger.error(f"Erro ao deletar aluno {MAT_ALUNO}: {e}")
             db.rollback()
             return False
 
@@ -244,20 +244,20 @@ class AlunoService:
             return 0
 
     @staticmethod
-    def aluno_existe(db: Session, mat: str) -> bool:
+    def aluno_existe(db: Session, MAT_ALUNO: int) -> bool:
         """
         Verifica se um aluno existe pelo matrícula
 
         Args:
             db: Sessão do banco de dados
-            mat: Matrícula do aluno
+            MAT_ALUNO: Matrícula do aluno
 
         Returns:
             True se o aluno existe, False caso contrário
         """
         try:
-            count = db.query(Aluno).filter(Aluno.mat == mat).count()
+            count = db.query(Aluno).filter(Aluno.MAT_ALUNO == MAT_ALUNO).count()
             return count > 0
         except SQLAlchemyError as e:
-            logger.error(f"Erro ao verificar se aluno {mat} existe: {e}")
+            logger.error(f"Erro ao verificar se aluno {MAT_ALUNO} existe: {e}")
             return False
