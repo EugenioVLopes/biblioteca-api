@@ -1,89 +1,166 @@
-# Biblioteca API
+# Sistema de Biblioteca - API
 
-## Descrição
+Este projeto implementa uma API para gerenciamento de biblioteca com banco de dados PostgreSQL e documentação automática usando Flask-RESTX/Swagger.
 
-API RESTful desenvolvida com NestJS para gerenciamento de biblioteca, permitindo operações CRUD para livros, usuários e empréstimos.
+## 📋 Pré-requisitos
 
-Este projeto foi desenvolvido como trabalho para a disciplina de Banco de Dados do Departamento de Computação e Automação (DCA) da Universidade Federal do Rio Grande do Norte (UFRN).
+- Docker e Docker Compose
+- Python 3.8+
+- pip (gerenciador de pacotes do Python)
 
-## Tecnologias Utilizadas
+## 🚀 Configuração e Inicialização
 
-- NestJS
-- TypeScript
-- Node.js
-- PostgreSQL (banco de dados)
-- Docker
+### Opção 1: Script Automático (Recomendado)
 
-## Configuração do Projeto
+#### No Windows:
 
 ```bash
-# Instalar dependências
-$ npm install
-
-# Configurar variáveis de ambiente
-$ cp .env.example .env
+setup_database.bat
 ```
 
-## Banco de Dados
-
-O projeto utiliza PostgreSQL como banco de dados, que pode ser executado facilmente usando Docker Compose:
+#### No Linux/Mac:
 
 ```bash
-# Iniciar o banco de dados
-$ docker-compose up -d
-
-# Parar o banco de dados
-$ docker-compose down
+chmod +x setup_database.sh
+./setup_database.sh
 ```
 
-Configurações do banco de dados:
-- Host: localhost
-- Porta: 5432
-- Usuário: postgres
-- Senha: postgres
-- Nome do banco: biblioteca
+### Opção 2: Configuração Manual
 
-## Executando o Projeto
+1. **Inicie o PostgreSQL:**
+
+   ```bash
+   docker-compose up -d
+   ```
+
+2. **Instale as dependências Python:**
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Inicialize o banco de dados:**
+   ```bash
+   python init_database.py
+   ```
+
+## 🗄️ Estrutura do Banco de Dados
+
+O sistema cria automaticamente as seguintes tabelas:
+
+### ALUNO
+
+- `MAT` (VARCHAR(20)) - Matrícula (PK)
+- `NOME` (VARCHAR(100)) - Nome do aluno
+- `EMAIL` (VARCHAR(100)) - Email
+- `CURSO` (VARCHAR(100)) - Curso
+
+### LIVRO
+
+- `COD` (INTEGER) - Código do livro (PK)
+- `TITULO` (VARCHAR(200)) - Título
+- `AUTOR` (VARCHAR(100)) - Autor
+- `EDITORA` (VARCHAR(100)) - Editora
+- `ANO` (INTEGER) - Ano de publicação
+
+### EXEMPLAR
+
+- `TOMBO` (INTEGER) - Número do tombo (PK)
+- `COD_LIVRO` (INTEGER) - Código do livro (FK)
+
+### EMPRESTIMO
+
+- `COD` (INTEGER) - Código do empréstimo (PK)
+- `MAT_ALUNO` (VARCHAR(20)) - Matrícula do aluno (FK)
+- `DATA_EMPRESTIMO` (DATE) - Data do empréstimo
+- `DATA_PREVISTA_DEV` (DATE) - Data prevista de devolução
+- `DATA_DEVOLUCAO` (DATE) - Data real de devolução
+- `DATA_ATRASO` (DATE) - Data de atraso
+
+### EMP_EXEMPLAR
+
+- `COD_EMPRESTIMO` (INTEGER) - Código do empréstimo (FK)
+- `TOMBO_EXEMPLAR` (INTEGER) - Tombo do exemplar (FK)
+
+## 📚 Documentação da API
+
+A API possui documentação automática gerada pelo Flask-RESTX/Swagger. Após iniciar a aplicação, você pode acessar:
+
+- **Documentação Swagger UI:** `http://localhost:5000/docs`
+- **Especificação OpenAPI:** `http://localhost:5000/swagger.json`
+
+### Endpoints Disponíveis
+
+A API está organizada em namespaces:
+
+- **`/alunos`** - Gerenciamento de alunos
+- **`/livros`** - Gerenciamento de livros
+- **`/exemplares`** - Gerenciamento de exemplares
+- **`/emprestimos`** - Gerenciamento de empréstimos
+- **`/emprestimo-exemplares`** - Relacionamento entre empréstimos e exemplares
+
+## 🔧 Scripts Disponíveis
+
+### `init_database.py`
+
+Script Python que:
+
+- Verifica conexão com o banco de dados
+- Checa se todas as tabelas existem
+- Cria as tabelas faltantes automaticamente
+- Fornece logs detalhados do processo
+
+### `init_db.sql`
+
+Arquivo SQL com os comandos CREATE TABLE para todas as tabelas do sistema.
+
+## 🐳 Comandos Docker Úteis
 
 ```bash
-# desenvolvimento
-$ npm run start
+# Iniciar o PostgreSQL
+docker-compose up -d
 
-# modo watch
-$ npm run start:dev
+# Parar o PostgreSQL
+docker-compose down
 
-# modo produção
-$ npm run start:prod
+# Ver logs do PostgreSQL
+docker-compose logs postgres
+
+# Conectar ao PostgreSQL via psql
+docker exec -it biblioteca-db psql -U postgres -d biblioteca
 ```
 
-## Testes
+## 📊 Configurações do Banco
 
-```bash
-# testes unitários
-$ npm run test
+- **Host:** localhost
+- **Porta:** 5432
+- **Banco:** biblioteca
+- **Usuário:** postgres
+- **Senha:** postgres
 
-# testes e2e
-$ npm run test:e2e
+## ⚡ Verificação Rápida
 
-# cobertura de testes
-$ npm run test:cov
-```
+Para verificar se tudo está funcionando:
 
-## Estrutura do Projeto
+1. Execute `python init_database.py`
+2. Se você ver "✅ Todas as tabelas já existem no banco de dados!", está tudo configurado
+3. Se você ver "🎉 Banco de dados inicializado com sucesso!", as tabelas foram criadas
+4. Inicie a aplicação: `python run.py`
+5. Acesse a documentação: `http://localhost:5000/docs`
 
-```
-src/
-├── livros/           # Módulo de livros
-├── usuarios/           # Módulo de usuários
-├── emprestimos/           # Módulo de empréstimos
-├── common/          # Recursos compartilhados
-└── main.ts          # Ponto de entrada da aplicação
-```
+## 🔍 Troubleshooting
 
-## Documentação da API
+### Erro de conexão com banco
 
-A documentação completa da API está disponível através do Swagger UI quando o servidor estiver em execução:
+- Verifique se o Docker está rodando: `docker ps`
+- Reinicie o PostgreSQL: `docker-compose restart`
 
-```
-http://localhost:3000/api
-```
+### Erro de dependências Python
+
+- Instale as dependências: `pip install -r requirements.txt`
+- Ou instale manualmente: `pip install psycopg2-binary sqlalchemy`
+
+### Tabelas não são criadas
+
+- Verifique as permissões do usuário postgres
+- Verifique os logs: `docker-compose logs postgres`
