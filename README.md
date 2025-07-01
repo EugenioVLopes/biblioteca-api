@@ -1,6 +1,6 @@
 # Sistema de Biblioteca - API
 
-Este projeto implementa uma API para gerenciamento de biblioteca com banco de dados PostgreSQL.
+Este projeto implementa uma API para gerenciamento de biblioteca com banco de dados PostgreSQL e documentação automática usando Flask-RESTX/Swagger.
 
 ## 📋 Pré-requisitos
 
@@ -82,6 +82,23 @@ O sistema cria automaticamente as seguintes tabelas:
 - `COD_EMPRESTIMO` (INTEGER) - Código do empréstimo (FK)
 - `TOMBO_EXEMPLAR` (INTEGER) - Tombo do exemplar (FK)
 
+## 📚 Documentação da API
+
+A API possui documentação automática gerada pelo Flask-RESTX/Swagger. Após iniciar a aplicação, você pode acessar:
+
+- **Documentação Swagger UI:** `http://localhost:5000/docs`
+- **Especificação OpenAPI:** `http://localhost:5000/swagger.json`
+
+### Endpoints Disponíveis
+
+A API está organizada em namespaces:
+
+- **`/alunos`** - Gerenciamento de alunos
+- **`/livros`** - Gerenciamento de livros
+- **`/exemplares`** - Gerenciamento de exemplares
+- **`/emprestimos`** - Gerenciamento de empréstimos
+- **`/emprestimo-exemplares`** - Relacionamento entre empréstimos e exemplares
+
 ## 🔧 Scripts Disponíveis
 
 ### `init_database.py`
@@ -128,6 +145,8 @@ Para verificar se tudo está funcionando:
 1. Execute `python init_database.py`
 2. Se você ver "✅ Todas as tabelas já existem no banco de dados!", está tudo configurado
 3. Se você ver "🎉 Banco de dados inicializado com sucesso!", as tabelas foram criadas
+4. Inicie a aplicação: `python run.py`
+5. Acesse a documentação: `http://localhost:5000/docs`
 
 ## 🔍 Troubleshooting
 
