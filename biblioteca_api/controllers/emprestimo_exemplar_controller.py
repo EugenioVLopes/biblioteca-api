@@ -37,10 +37,14 @@ class EmprestimoExemplaresList(Resource):
         """Adiciona um exemplar a um empréstimo"""
         data = request.get_json()
 
-        # Verificar se o empréstimo existe
         emprestimo = db.session.get(Emprestimo, data["COD_EMPRESTIMO"])
         if not emprestimo:
             emprestimo_exemplares_ns.abort(400, "Empréstimo não encontrado")
+
+        if emprestimo.DATA_DEVOLUCAO is not None:
+            emprestimo_exemplares_ns.abort(
+                400, "Não é possível adicionar exemplares a um empréstimo já devolvido."
+            )
 
         # Verificar se o exemplar existe
         exemplar = db.session.get(Exemplar, data["TOMBO_EXEMPLAR"])

@@ -19,6 +19,7 @@ api = Api(
         }
     },
     security="apikey",
+    mask_swagger=False,
 )
 
 

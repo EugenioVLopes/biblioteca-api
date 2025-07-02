@@ -6,7 +6,12 @@ from flask_restx import Namespace, Resource
 from .. import db
 from ..models.aluno import Aluno
 from ..models.emprestimo import Emprestimo
-from ..models.swagger_models import emprestimo_model, error_model, message_model
+from ..models.swagger_models import (
+    emprestimo_create_model,
+    emprestimo_model,
+    error_model,
+    message_model,
+)
 
 emprestimos_ns = Namespace(
     "Emprestimos", description="Operações relacionadas a empréstimos"
@@ -23,7 +28,7 @@ class EmprestimosList(Resource):
         return [emprestimo.to_dict() for emprestimo in emprestimos]
 
     @emprestimos_ns.doc("criar_emprestimo")
-    @emprestimos_ns.expect(emprestimo_model)
+    @emprestimos_ns.expect(emprestimo_create_model)
     @emprestimos_ns.marshal_with(emprestimo_model, code=201)
     @emprestimos_ns.response(400, "Aluno não encontrado", error_model)
     @emprestimos_ns.response(500, "Erro interno do servidor", error_model)
@@ -44,8 +49,6 @@ class EmprestimosList(Resource):
                 MAT_ALUNO=data["MAT_ALUNO"],
                 DATA_EMPRESTIMO=data_emprestimo,
                 DATA_PREVISTA_DEV=data_prevista_dev,
-                DATA_DEVOLUCAO=None,
-                DATA_ATRASO=None,
             )
             db.session.add(new_emprestimo)
             db.session.commit()

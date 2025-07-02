@@ -68,6 +68,13 @@ emprestimo_model = api.model(
     },
 )
 
+emprestimo_create_model = api.model(
+    "EmprestimoCreate",
+    {
+        "MAT_ALUNO": fields.Integer(required=True, description="Matrícula do aluno"),
+    },
+)
+
 # Modelo para Empréstimo Exemplar
 emprestimo_exemplar_model = api.model(
     "EmprestimoExemplar",
