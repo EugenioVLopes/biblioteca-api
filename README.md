@@ -12,17 +12,11 @@ Este projeto implementa uma API para gerenciamento de biblioteca com banco de da
 
 ### Opção 1: Script Automático (Recomendado)
 
-#### No Windows:
-
-```bash
-setup_database.bat
-```
-
 #### No Linux/Mac:
 
 ```bash
-chmod +x setup_database.sh
-./setup_database.sh
+chmod +x start.sh
+./start.sh
 ```
 
 ### Opção 2: Configuração Manual
@@ -41,7 +35,7 @@ chmod +x setup_database.sh
 
 3. **Inicialize o banco de dados:**
    ```bash
-   python init_database.py
+   python -c "from db import initialize_database; initialize_database()"
    ```
 
 ## 🗄️ Estrutura do Banco de Dados
@@ -50,14 +44,14 @@ O sistema cria automaticamente as seguintes tabelas:
 
 ### ALUNO
 
-- `MAT` (VARCHAR(20)) - Matrícula (PK)
+- `MAT_ALUNO` (INTEGER) - Matrícula (PK, Auto-incremento)
 - `NOME` (VARCHAR(100)) - Nome do aluno
 - `EMAIL` (VARCHAR(100)) - Email
 - `CURSO` (VARCHAR(100)) - Curso
 
 ### LIVRO
 
-- `COD` (INTEGER) - Código do livro (PK)
+- `COD` (INTEGER) - Código do livro (PK, Auto-incremento)
 - `TITULO` (VARCHAR(200)) - Título
 - `AUTOR` (VARCHAR(100)) - Autor
 - `EDITORA` (VARCHAR(100)) - Editora
@@ -65,13 +59,13 @@ O sistema cria automaticamente as seguintes tabelas:
 
 ### EXEMPLAR
 
-- `TOMBO` (INTEGER) - Número do tombo (PK)
+- `TOMBO` (INTEGER) - Número do tombo (PK, Auto-incremento)
 - `COD_LIVRO` (INTEGER) - Código do livro (FK)
 
 ### EMPRESTIMO
 
 - `COD` (INTEGER) - Código do empréstimo (PK)
-- `MAT_ALUNO` (VARCHAR(20)) - Matrícula do aluno (FK)
+- `MAT_ALUNO` (INTEGER) - Matrícula do aluno (FK)
 - `DATA_EMPRESTIMO` (DATE) - Data do empréstimo
 - `DATA_PREVISTA_DEV` (DATE) - Data prevista de devolução
 - `DATA_DEVOLUCAO` (DATE) - Data real de devolução
@@ -101,7 +95,7 @@ A API está organizada em namespaces:
 
 ## 🔧 Scripts Disponíveis
 
-### `init_database.py`
+### `db.py`
 
 Script Python que:
 
@@ -142,7 +136,7 @@ docker exec -it biblioteca-db psql -U postgres -d biblioteca
 
 Para verificar se tudo está funcionando:
 
-1. Execute `python init_database.py`
+1. Execute `python -c "from db import initialize_database; initialize_database()"`
 2. Se você ver "✅ Todas as tabelas já existem no banco de dados!", está tudo configurado
 3. Se você ver "🎉 Banco de dados inicializado com sucesso!", as tabelas foram criadas
 4. Inicie a aplicação: `python run.py`
